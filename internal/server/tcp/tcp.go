@@ -6,6 +6,7 @@ import (
 )
 
 type Server struct {
+	conn net.Listener
 }
 
 func New() *Server {
@@ -13,15 +14,15 @@ func New() *Server {
 }
 
 func (s *Server) Run(host, port string) error {
-	l, err := net.Listen("tcp", net.JoinHostPort(host, port))
+	conn, err := net.Listen("tcp", net.JoinHostPort(host, port))
 	if err != nil {
 		return err
 	}
-	defer l.Close()
+	defer conn.Close()
+	s.conn = conn
 
 	for {
-
-		c, err := l.Accept()
+		c, err := conn.Accept()
 		if err != nil {
 			return err
 		}
@@ -32,4 +33,8 @@ func (s *Server) Run(host, port string) error {
 
 func handleConnection(c net.Conn) {
 	fmt.Println(c.RemoteAddr().String())
+}
+
+func (s *Server) Stop() error {
+	return s.conn.Close()
 }

@@ -6,6 +6,7 @@ import (
 )
 
 type Server struct {
+	conn *net.UDPConn
 }
 
 func New() *Server {
@@ -23,6 +24,7 @@ func (s *Server) Run(host, port string) error {
 		return err
 	}
 	defer conn.Close()
+	s.conn = conn
 
 	for {
 		handleConnection(conn)
@@ -31,4 +33,8 @@ func (s *Server) Run(host, port string) error {
 
 func handleConnection(c *net.UDPConn) {
 	fmt.Println(c.RemoteAddr().String())
+}
+
+func (s *Server) Stop() error {
+	return s.conn.Close()
 }

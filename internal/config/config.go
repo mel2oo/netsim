@@ -1,7 +1,14 @@
 package config
 
+import (
+	"netsim/pkg/logger"
+
+	"github.com/spf13/viper"
+)
+
 type Config struct {
-	Listener Listener `mapstructure:"listener"`
+	Logger   logger.Config `mapstructure:"logger"`
+	Listener Listener      `mapstructure:"listener"`
 }
 
 type Listener struct {
@@ -17,4 +24,18 @@ type TCP struct {
 type UDP struct {
 	Host string `mapstructure:"host"`
 	Port string `mapstructure:"port"`
+}
+
+func Load(path string) (v *Config, err error) {
+	viper.SetConfigFile(path)
+
+	if err = viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+
+	if err = viper.Unmarshal(&v); err != nil {
+		return nil, err
+	}
+
+	return
 }
