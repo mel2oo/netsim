@@ -1,0 +1,5 @@
+package iptables
+
+func Init() {
+
+}
