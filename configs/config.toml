@@ -9,7 +9,7 @@
     # log file max num
     max-backups = 15
     # log file storage dir
-    output = "/home/netsim/log"
+    output = "log"
     # enabled stdout
     stdout = true
 

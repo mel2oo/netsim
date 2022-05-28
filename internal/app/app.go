@@ -1,34 +1,81 @@
 package app
 
 import (
+	"context"
+	"errors"
 	"netsim/internal/config"
+	"netsim/internal/server"
 	"netsim/internal/server/tcp"
 	"netsim/internal/server/udp"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"golang.org/x/sync/errgroup"
 )
 
 type App struct {
-	c config.Listener
+	ctx    context.Context
+	cancel func()
 
-	tcp *tcp.Server
-	udp *udp.Server
+	cnf  *config.Listener
+	srvs []server.Server
+	sigs []os.Signal
 }
 
-func New(c config.Listener) *App {
+func New(cnf *config.Listener) *App {
+	ctx, cancel := context.WithCancel(context.Background())
+
 	return &App{
-		c:   c,
-		tcp: tcp.New(),
-		udp: udp.New(),
+		ctx:    ctx,
+		cancel: cancel,
+		cnf:    cnf,
+		srvs: []server.Server{
+			tcp.New(cnf.Tcp.Host, cnf.Tcp.Port),
+			udp.New(cnf.Udp.Host, cnf.Udp.Port),
+		},
+		sigs: []os.Signal{syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT},
 	}
 }
 
 func (a *App) Run() error {
-	if err := a.tcp.Run(a.c.Tcp.Host, a.c.Tcp.Port); err != nil {
+	g, ctx := errgroup.WithContext(a.ctx)
+	for _, srv := range a.srvs {
+		srv := srv
+
+		g.Go(func() error {
+			<-ctx.Done()
+			return srv.Stop()
+		})
+
+		g.Go(func() error {
+			return srv.Start()
+		})
+	}
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, a.sigs...)
+	g.Go(func() error {
+		for {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-c:
+				a.Stop()
+			}
+		}
+	})
+
+	if err := g.Wait(); err != nil && !errors.Is(err, context.Canceled) {
 		return err
 	}
 
-	if err := a.udp.Run(a.c.Udp.Host, a.c.Udp.Port); err != nil {
-		return err
-	}
+	return nil
+}
 
-	select {}
+func (a *App) Stop() error {
+	if a.cancel != nil {
+		a.cancel()
+	}
+	return nil
 }

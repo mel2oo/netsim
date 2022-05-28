@@ -6,6 +6,7 @@ require (
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.12.0
+	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"netsim/internal/app"
 	"netsim/internal/config"
 	"netsim/pkg/logger"
 )
@@ -23,4 +24,7 @@ func main() {
 		panic(err)
 	}
 
+	if err := app.New(&cnf.Listener).Run(); err != nil {
+		panic(err)
+	}
 }

@@ -1,38 +1,46 @@
 package udp
 
 import (
-	"fmt"
 	"net"
+
+	"github.com/sirupsen/logrus"
 )
 
 type Server struct {
+	addr *net.UDPAddr
 	conn *net.UDPConn
 }
 
-func New() *Server {
-	return &Server{}
+func New(host, port string) *Server {
+	addr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(host, port))
+	if err != nil {
+		panic(err)
+	}
+
+	return &Server{addr: addr}
 }
 
-func (s *Server) Run(host, port string) error {
-	addr, err := net.ResolveUDPAddr("udp4", net.JoinHostPort(host, port))
-	if err != nil {
-		return err
-	}
+func (s *Server) Start() (err error) {
 
-	conn, err := net.ListenUDP("udp", addr)
+	s.conn, err = net.ListenUDP("udp", s.addr)
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
-	s.conn = conn
+	defer s.conn.Close()
+
+	logrus.Infof("udp listen on: %s", s.addr.String())
 
 	for {
-		handleConnection(conn)
+		handleConnection(s.conn)
 	}
 }
 
 func handleConnection(c *net.UDPConn) {
-	fmt.Println(c.RemoteAddr().String())
+	d := make([]byte, 1024)
+	_, _, err := c.ReadFromUDP(d)
+	if err != nil {
+		return
+	}
 }
 
 func (s *Server) Stop() error {
