@@ -1,6 +1,8 @@
 package server
 
+import "netsim/internal/service"
+
 type Server interface {
-	Start() error
-	Stop() error
+	service.Listener
+	service.Handler
 }

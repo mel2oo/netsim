@@ -8,22 +8,16 @@ import (
 
 type Config struct {
 	Logger   logger.Config `mapstructure:"logger"`
-	Listener Listener      `mapstructure:"listener"`
+	Listener []Listener    `mapstructure:"listener"`
 }
 
 type Listener struct {
-	Tcp TCP `mapstructure:"tcp"`
-	Udp UDP `mapstructure:"udp"`
-}
-
-type TCP struct {
-	Host string `mapstructure:"host"`
-	Port string `mapstructure:"port"`
-}
-
-type UDP struct {
-	Host string `mapstructure:"host"`
-	Port string `mapstructure:"port"`
+	Transport string `mapstructure:"transport"`
+	Protocol  string `mapstructure:"protocol"`
+	Prot      int    `mapstructure:"port"`
+	Size      int    `mapstructure:"size"`
+	RTimeout  int    `mapstructure:"rtimeout"`
+	WTimeout  int    `mapstructure:"wtimeout"`
 }
 
 func Load(path string) (v *Config, err error) {

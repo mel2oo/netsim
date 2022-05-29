@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 	"netsim/internal/config"
-	"netsim/internal/server"
-	"netsim/internal/server/tcp"
-	"netsim/internal/server/udp"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"netsim/internal/service"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -19,7 +18,7 @@ type App struct {
 	cancel func()
 
 	cnf  *config.Listener
-	srvs []server.Server
+	srvs []service.Listener
 	sigs []os.Signal
 }
 
@@ -30,10 +29,10 @@ func New(cnf *config.Listener) *App {
 		ctx:    ctx,
 		cancel: cancel,
 		cnf:    cnf,
-		srvs: []server.Server{
-			tcp.New(cnf.Tcp.Host, cnf.Tcp.Port),
-			udp.New(cnf.Udp.Host, cnf.Udp.Port),
-		},
+		// srvs: []service.Listener{
+		// 	tcp.New(cnf.Tcp.Host, cnf.Tcp.Port),
+		// 	udp.New(cnf.Udp.Host, cnf.Udp.Port),
+		// },
 		sigs: []os.Signal{syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT},
 	}
 }

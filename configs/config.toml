@@ -14,14 +14,27 @@
     stdout = true
 
 # network listener configure
-[listener]
+[[listener]]
+    transport   = "udp"
+    protocol    = "dns"
+    port        = 17853
+    size        = 1048
+    rtimeout    = 2
+    wtimeout    = 2
 
-    # tcp raw listener
-    [listener.tcp]
-        host    = "127.0.0.1"
-        port    = "17888"
+    # # tcp raw listener
+    # [listener.tcp]
+    #     host    = "127.0.0.1"
+    #     port    = "17888"
 
-    # udp raw listener
-    [listener.udp]
-        host    = "127.0.0.1"
-        port    = "17889"
+    # # udp raw listener
+    # [listener.udp]
+    #     host    = "127.0.0.1"
+    #     port    = "17889"
+
+    # [listener.dns]
+    #     port        = "17853"
+    #     protocol    = "dns"
+    #     buffersize  = 1048
+    #     rtimeout    = 2
+    #     wtimeout    = 2
