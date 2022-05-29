@@ -15,26 +15,25 @@
 
 # network listener configure
 [[listener]]
-    transport   = "udp"
-    protocol    = "dns"
-    port        = 17853
+    transport   = "tcp"
+    protocol    = "tcp"
+    port        = 17000
     size        = 1048
     rtimeout    = 2
     wtimeout    = 2
 
-    # # tcp raw listener
-    # [listener.tcp]
-    #     host    = "127.0.0.1"
-    #     port    = "17888"
+[[listener]]
+    transport   = "udp"
+    protocol    = "udp"
+    port        = 18000
+    size        = 1048
+    rtimeout    = 2
+    wtimeout    = 2
 
-    # # udp raw listener
-    # [listener.udp]
-    #     host    = "127.0.0.1"
-    #     port    = "17889"
-
-    # [listener.dns]
-    #     port        = "17853"
-    #     protocol    = "dns"
-    #     buffersize  = 1048
-    #     rtimeout    = 2
-    #     wtimeout    = 2
+[[listener]]
+    transport   = "udp"
+    protocol    = "dns"
+    port        = 18053
+    size        = 1048
+    rtimeout    = 2
+    wtimeout    = 2

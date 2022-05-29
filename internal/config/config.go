@@ -14,7 +14,7 @@ type Config struct {
 type Listener struct {
 	Transport string `mapstructure:"transport"`
 	Protocol  string `mapstructure:"protocol"`
-	Prot      int    `mapstructure:"port"`
+	Port      int    `mapstructure:"port"`
 	Size      int    `mapstructure:"size"`
 	RTimeout  int    `mapstructure:"rtimeout"`
 	WTimeout  int    `mapstructure:"wtimeout"`

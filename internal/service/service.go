@@ -1,15 +1,7 @@
 package service
 
-type Listener interface {
-	Start() error
-	Stop() error
-}
+import "time"
 
-type Handler interface {
-}
-
-type Resolver interface {
-}
-
-type Transport interface {
-}
+const (
+	KeepAliveTime = 180 * time.Second
+)
