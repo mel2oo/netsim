@@ -14,5 +14,9 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# log and bin directories
 bin/
 log/
+
+# debug binary file
+*__debug_bin
