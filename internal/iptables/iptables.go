@@ -1,5 +1,10 @@
 package iptables
 
-func Init() {
+type Options struct {
+}
+
+type Option func(opts *Options)
+
+func Set(opts ...Option) {
 
 }

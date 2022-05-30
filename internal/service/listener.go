@@ -3,5 +3,6 @@ package service
 import "net"
 
 type Listener interface {
-	net.Listener
+	ListenAndServe()
+	Serve(c net.Conn)
 }

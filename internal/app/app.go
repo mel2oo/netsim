@@ -5,6 +5,8 @@ import (
 	"errors"
 	"netsim/internal/config"
 	"netsim/internal/server"
+	"netsim/internal/server/tls"
+	"netsim/internal/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -25,6 +27,12 @@ type App struct {
 func New(cnf *config.Config) *App {
 	ctx, cancel := context.WithCancel(context.Background())
 	srvs := make([]*server.Server, 0)
+
+	tlscnf, err := tls.Load(cnf.TLS.Cert, cnf.TLS.Key, cnf.TLS.Ca)
+	if err != nil {
+		panic(err)
+	}
+	service.DefaultTLSConfig = tlscnf
 
 	for _, sc := range cnf.Listener {
 		srv, err := server.New(sc)

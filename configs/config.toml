@@ -13,6 +13,28 @@
     # enabled stdout
     stdout = true
 
+# tls certificate configure
+[tls]
+    ca      = "../configs/rootCA.crt"
+    cert    = "../configs/localhost.crt"
+    key     = "../configs/localhost.key"
+
+# dns reslover configure
+[reslover]
+    dns         = ":15353"
+    dnsserver   = ["8.8.8.8"]
+    timeout     = 3
+    maxTTL      = 1800
+    minTTL      = 0
+    cache       = 4096
+
+# tunnel forwarder configure
+[forwarder]
+    mode            = "direct"
+    dial-timeout    = 3
+    relay-timeout   = 3
+
+
 # network listener configure
 [[listener]]
     transport   = "tcp"
@@ -21,19 +43,3 @@
     size        = 1048
     rtimeout    = 2
     wtimeout    = 2
-
-# [[listener]]
-#     transport   = "udp"
-#     protocol    = "udp"
-#     port        = 18000
-#     size        = 1048
-#     rtimeout    = 2
-#     wtimeout    = 2
-
-# [[listener]]
-#     transport   = "udp"
-#     protocol    = "dns"
-#     port        = 18053
-#     size        = 1048
-#     rtimeout    = 2
-#     wtimeout    = 2

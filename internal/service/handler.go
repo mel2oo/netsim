@@ -5,18 +5,16 @@ import (
 )
 
 type Handler interface {
-	Init(options ...HandlerOption)
-	Handle(net.Conn)
+	TCPHandler
+	UDPHandler
 }
 
-type HandlerOptions struct {
-	Addr string
+type TCPHandler interface {
+	Addr() string
+	Dial(network, addr string) (c net.Conn, err error)
 }
 
-type HandlerOption func(opts *HandlerOptions)
-
-func WithHandlerAddr(addr string) HandlerOption {
-	return func(opts *HandlerOptions) {
-		opts.Addr = addr
-	}
+type UDPHandler interface {
+	Addr() string
+	DialUDP(network, addr string) (pc net.PacketConn, err error)
 }

@@ -1,6 +1,9 @@
 package service
 
-import "time"
+import (
+	"crypto/tls"
+	"time"
+)
 
 const (
 	DefaultKeepAliveTime = 180 * time.Second
@@ -13,4 +16,8 @@ const (
 
 const (
 	ProroclTCP = "tcp"
+)
+
+var (
+	DefaultTLSConfig *tls.Config
 )
