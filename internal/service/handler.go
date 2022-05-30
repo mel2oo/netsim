@@ -1,7 +1,22 @@
 package service
 
-import "netsim/internal/tunnel/forward"
+import (
+	"net"
+)
 
 type Handler interface {
-	forward.Forwarder
+	Init(options ...HandlerOption)
+	Handle(net.Conn)
+}
+
+type HandlerOptions struct {
+	Addr string
+}
+
+type HandlerOption func(opts *HandlerOptions)
+
+func WithHandlerAddr(addr string) HandlerOption {
+	return func(opts *HandlerOptions) {
+		opts.Addr = addr
+	}
 }

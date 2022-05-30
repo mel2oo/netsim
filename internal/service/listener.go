@@ -1,6 +1,7 @@
 package service
 
+import "net"
+
 type Listener interface {
-	Start() error
-	Stop() error
+	net.Listener
 }

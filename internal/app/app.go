@@ -9,6 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -16,17 +17,22 @@ type App struct {
 	ctx    context.Context
 	cancel func()
 
-	cnf  config.Config
+	cnf  *config.Config
 	srvs []*server.Server
 	sigs []os.Signal
 }
 
-func New(cnf config.Config) *App {
+func New(cnf *config.Config) *App {
 	ctx, cancel := context.WithCancel(context.Background())
 	srvs := make([]*server.Server, 0)
 
 	for _, sc := range cnf.Listener {
-		srvs = append(srvs, server.New(sc))
+		srv, err := server.New(sc)
+		if err != nil {
+			logrus.Warnf("[netsim] create proxy server fail, %s", err.Error())
+		} else {
+			srvs = append(srvs, srv)
+		}
 	}
 
 	return &App{
@@ -45,11 +51,11 @@ func (a *App) Run() error {
 
 		g.Go(func() error {
 			<-ctx.Done()
-			return srv.Stop()
+			return srv.Close()
 		})
 
 		g.Go(func() error {
-			return srv.Start()
+			return srv.Serve()
 		})
 	}
 

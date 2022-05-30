@@ -17,23 +17,23 @@
 [[listener]]
     transport   = "tcp"
     protocol    = "tcp"
-    port        = 17000
+    address     = ":17000"
     size        = 1048
     rtimeout    = 2
     wtimeout    = 2
 
-[[listener]]
-    transport   = "udp"
-    protocol    = "udp"
-    port        = 18000
-    size        = 1048
-    rtimeout    = 2
-    wtimeout    = 2
+# [[listener]]
+#     transport   = "udp"
+#     protocol    = "udp"
+#     port        = 18000
+#     size        = 1048
+#     rtimeout    = 2
+#     wtimeout    = 2
 
-[[listener]]
-    transport   = "udp"
-    protocol    = "dns"
-    port        = 18053
-    size        = 1048
-    rtimeout    = 2
-    wtimeout    = 2
+# [[listener]]
+#     transport   = "udp"
+#     protocol    = "dns"
+#     port        = 18053
+#     size        = 1048
+#     rtimeout    = 2
+#     wtimeout    = 2
