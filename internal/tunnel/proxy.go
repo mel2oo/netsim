@@ -6,8 +6,8 @@ import (
 )
 
 type Proxy interface {
-	Dial(network, addr string) (c net.Conn, handler service.Handler, err error)
-	DialUDP(network, addr string) (pc net.PacketConn, dialer service.UDPHandler, err error)
-	NextDialer(dstAddr string) service.Handler
-	Record(dialer service.Handler, success bool)
+	Dial(network, addr string) (net.Conn, service.Dialer, error)
+	DialUDP(network, addr string) (net.PacketConn, service.UDPDialer, error)
+	// NextDialer(dstAddr string) service.Dialer
+	Record(service.Dialer, bool)
 }

@@ -12,7 +12,7 @@ var (
 )
 
 type Forwarder struct {
-	service.Handler
+	service.Dialer
 	addr string
 }
 
@@ -23,14 +23,14 @@ func NewForwarder(mode string, dialTimeout, relayTimeout time.Duration) (*Forwar
 			return nil, err
 		}
 
-		return &Forwarder{Handler: d, addr: d.Addr()}, nil
+		return &Forwarder{Dialer: d, addr: d.Addr()}, nil
 	}
 
 	return nil, errModeNotSupport
 }
 
 func (f *Forwarder) Dial(network, addr string) (net.Conn, error) {
-	c, err := f.Handler.Dial(network, addr)
+	c, err := f.Dialer.Dial(network, addr)
 	if err != nil {
 		return nil, err
 	}

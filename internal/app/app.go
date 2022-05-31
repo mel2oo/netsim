@@ -63,7 +63,7 @@ func (a *App) Run() error {
 		})
 
 		g.Go(func() error {
-			return srv.Serve()
+			return srv.ListenAndServe()
 		})
 	}
 

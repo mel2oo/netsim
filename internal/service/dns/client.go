@@ -5,7 +5,6 @@ import (
 	"io"
 	"net"
 	"net/netip"
-	"netsim/internal/config"
 	"netsim/internal/tunnel"
 	"netsim/pkg/pool"
 	"strconv"
@@ -26,7 +25,7 @@ type Config struct {
 }
 
 type Client struct {
-	forwarder   *tunnel.Forwarder
+	tunnel      *tunnel.Tunnel
 	cache       *LruCache
 	config      *Config
 	upStream    *UPStream
@@ -34,18 +33,9 @@ type Client struct {
 	handlers    []AnswerHandler
 }
 
-func NewClient(fc *config.Forwarder, cc *Config) (*Client, error) {
-	forwarder, err := tunnel.NewForwarder(
-		fc.Mode,
-		time.Duration(fc.DTimeout)*time.Second,
-		time.Duration(fc.RTimeout)*time.Second,
-	)
-	if err != nil {
-		return nil, err
-	}
-
+func NewClient(cc *Config, tunnel *tunnel.Tunnel) (*Client, error) {
 	return &Client{
-		forwarder:   forwarder,
+		tunnel:      tunnel,
 		cache:       NewLruCache(cc.CacheSize),
 		config:      cc,
 		upStream:    NewUPStream(cc.DnsServers),
@@ -146,30 +136,30 @@ func (c *Client) exchange(qname string, reqBytes []byte, preferTCP bool) (
 
 	// use tcp to connect upstream server default
 	network = "tcp"
-	dialer := c.forwarder.Handler(qname + ":0")
+	// dialer := c.forwarder.Handler(qname + ":0")
 
 	// if we are resolving a domain which uses a forwarder `REJECT`, then use `DIRECT` instead
 	// so we can resolve it correctly.
 	// TODO: dialer.Addr() == "REJECT", tricky
-	if dialer.Addr() == "REJECT" {
-		dialer = c.proxy.NextDialer("direct:0")
-	}
+	// if dialer.Addr() == "REJECT" {
+	// dialer = c.proxy.NextDialer("direct:0")
+	// }
 
 	// If client uses udp and no forwarders specified, use udp
 	// TODO: dialer.Addr() == "DIRECT", tricky
-	if !preferTCP && dialer.Addr() == "DIRECT" {
-		network = "udp"
-	}
+	// if !preferTCP && dialer.Addr() == "DIRECT" {
+	// 	network = "udp"
+	// }
 
 	ups := c.UpStream(qname)
 	server = ups.Server()
 	for i := 0; i < ups.Len(); i++ {
 		var rc net.Conn
-		rc, err = dialer.Dial(network, server)
+		rc, err = c.forwarder.Dial(network, server)
 		if err != nil {
 			newServer := ups.SwitchIf(server)
 			logrus.Infof("[dns] error in resolving %s, failed to connect to server %v via %s: %v, next server: %s",
-				qname, server, dialer.Addr(), err, newServer)
+				qname, server, c.forwarder.Addr(), err, newServer)
 			server = newServer
 			continue
 		}
@@ -193,17 +183,17 @@ func (c *Client) exchange(qname string, reqBytes []byte, preferTCP bool) (
 
 		newServer := ups.SwitchIf(server)
 		logrus.Infof("[dns] error in resolving %s, failed to exchange with server %v via %s: %v, next server: %s",
-			qname, server, dialer.Addr(), err, newServer)
+			qname, server, c.forwarder.Addr(), err, newServer)
 
 		server = newServer
 	}
 
 	// if all dns upstreams failed, then maybe the forwarder is not available.
-	if err != nil {
-		c.proxy.Record(dialer, false)
-	}
+	// if err != nil {
+	// 	c.proxy.Record(dialer, false)
+	// }
 
-	return server, network, dialer.Addr(), respBytes, err
+	return server, network, c.forwarder.Addr(), respBytes, err
 }
 
 func (c *Client) exchangeTCP(rc net.Conn, reqBytes []byte) ([]byte, error) {
